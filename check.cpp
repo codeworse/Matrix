@@ -13,11 +13,10 @@ namespace Matrix_tests {
     void check_constructor() {
         std::cout << "Start checking constructor..." << std::endl;
         {
-            Algebra::Matrix<int> M_int;
             Algebra::Matrix<long long> Mat_long(2, 2, 2);
             std::vector<std::vector<long long> > Mat_long_vec = Mat_long;
-            if (std::vector<std::vector<long long>>{{2, 2},
-                                                    {2, 2}} != Mat_long_vec) {
+            if (std::vector<std::vector<long long> >({{2, 2},
+                                                      {2, 2}}) != Mat_long_vec) {
                 fail("wrong convert to std::vector<std::vector<long long> >");
             }
         }
@@ -84,50 +83,61 @@ namespace Matrix_tests {
     }
 }
 namespace Tasks {
-    void Task2() {
-        std::cout << "-----Task 2-----\n";
-        Algebra::Matrix<double> A({{-4, 12,  3,  -9},
-                                   {-4, 6,   -3, 3},
-                                   {12, -18, 9,  -9},
-                                   {4,  -6,  3,  -3}});
-        std::cout << "A.T -> \n" << (A.T()).row_echelon_form() << "\n";
-        std::cout << "A -> \n" << A.row_echelon_form() << "\n";
-        Algebra::Matrix<double> B({{-9, -4, 4, 0},
-                                   {15, 8,  0, 4},
-                                   {-1, 0,  0, 0}});
-        std::cout << "rk(B) = " << B.rank() << "\n";
+    void Task1() {
+        std::cout << "-----Task 1-----\n";
+        Algebra::Matrix<double> A({{6,  3,  -1, 1},
+                                   {-1, 1,  1,  -2},
+                                   {-1, -4, 6,  -2},
+                                   {1,  4,  -1, 7}});
+        Algebra::Matrix<double> B({{4,  -7, -5, -3},
+                                   {-1, 1,  -3, -2},
+                                   {1,  4,  8,  2},
+                                   {1,  4,  3,  7}});
+        Algebra::Matrix<double> C({{6,  4,  2,  -1},
+                                   {-1, -1, -3, 2},
+                                   {1,  8,  9,  -3},
+                                   {-1, -4, -2, 6}});
+        std::cout << "A: " << A.Characteristic_poly() << "\n";
+        std::cout << "B: " << B.Characteristic_poly() << "\n";
+        std::cout << "C: " << C.Characteristic_poly() << "\n";
+        std::cout << "rk(A - 5) = " << (A - 5).rank() << "\n";
+        std::cout << "rk(B - 5) = " << (B - 5).rank() << "\n";
+        std::cout << "rk(C - 5) = " << (C - 5).rank() << "\n";
+        std::cout << "rk((A - 5)^2) = " << ((A - 5) * (A - 5)).rank() << "\n";
+        std::cout << "rk((B - 5)^2) = " << ((B - 5) * (B - 5)).rank() << "\n";
+        std::cout << (C - 5) * (C - 5) << "\n";
+        std::cout << "rk((C - 5)^2) = " << ((C - 5) * (C - 5)).rank() << "\n";
     }
 
-    void Task3() {
-        std::cout << "-----Task 3-----\n";
-
-        Algebra::Matrix<double> A({{4, -4, 9,  5},
-                                   {2, -2, 11, 6},
-                                   {0, 0,  4,  2},
-                                   {0, 0,  -4, -2}});
-        std::cout << (A * A) << "\n\n";
-        std::cout << (A * A).row_echelon_form() << "\n\n";
-        std::cout << "rk(A) = " << A.rank() << "\n";
-        std::cout << "rk(A^2) = " << (A * A).rank() << "\n";
-        std::cout << "rk(A^3) = " << (A * A * A).rank() << "\n";
-        std::cout << "rk(A^4) = " << (A * A * A * A).rank() << "\n";
-        Algebra::Matrix<double> A_T = A.T();
-        std::cout << (A_T * A_T) << "\n\n";
-        std::cout << (A_T * A_T).row_echelon_form() << "\n\n";
-        std::cout << "rk(A_T) = " << A_T.rank() << "\n";
-        std::cout << "rk(A_T^2) = " << (A_T * A_T).rank() << "\n";
-        std::cout << "rk(A_T^3) = " << (A_T * A_T * A_T).rank() << "\n";
-        std::cout << "rk(A_T^4) = " << (A_T * A_T * A_T * A_T).rank() << "\n";
-        Algebra::Matrix<double> C({{4,  -4, 0, 1},
-                                   {0,  0,  2, 1},
-                                   {1,  -2, 3, 0},
-                                   {-1, 2,  0, 3}});
-        std::cout << "rk(C) = " << C.rank() << "\n";
-        Algebra::Matrix<double> Cv({{4,  -4, 0, 1, -2},
-                                    {0,  0,  2, 1, -9},
-                                    {1,  -2, 3, 0, -5},
-                                    {-1, 2,  0, 3, -7}});
-        std::cout << Cv.row_echelon_form() << "\n";
+    void Task2() {
+        std::cout << "-----Task 2-----\n";
+        Algebra::Matrix<double> A({{3,  -3, -1, 0, 0,  0},
+                                   {0,  5,  1,  0, 0,  0},
+                                   {0,  -2, 2,  0, 0,  0},
+                                   {-2, -3, -3, 1, -1, 0},
+                                   {4,  8,  6,  4, 5,  0},
+                                   {1,  2,  1,  2, 2,  4}});
+        Algebra::Matrix<double> B({{3, -3, -1},
+                                   {0, 5,  1},
+                                   {0, -2, 2}});
+        Algebra::Matrix<double> D({{1, -1, 0},
+                                   {4, 5,  0},
+                                   {2, 2,  4}});
+        std::cout << "B : " << B.Characteristic_poly() << "\n";
+        std::cout << "C : " << D.Characteristic_poly() << "\n";
+        std::cout << A.Characteristic_poly() << "\n";
+        std::cout << "rk(A - 3) = " << (A - 3).rank() << "\n";
+        std::cout << "rk((A - 3)^2) = " << ((A - 3) * (A - 3)).rank() << "\n";
+        std::cout << "rk((A - 3)^3) = " << ((A - 3) * (A - 3) * (A - 3)).rank() << "\n\n";
+        std::cout << "rk(A - 4) = " << (A - 4).rank() << "\n";
+        std::cout << "A = \n" << (A - 3).row_echelon_form() << "\n";
+        Algebra::Matrix<double> u1({{1, 0, 0, -1, 0, 1}});
+        Algebra::Matrix<double> u2({{-1, 0, 0, -1.5, 1, 0}});
+        auto u3 = u1.T();
+        std::cout << "ok\n";
+        Algebra::Matrix<double> R = A - 3;
+        Algebra::Matrix<double> ans = R * u3;
+        std::cout << ans;
     }
 
     void Task4() {
@@ -160,7 +170,6 @@ namespace Tasks {
 }
 
 int main() {
+    Tasks::Task1();
     Tasks::Task2();
-    Tasks::Task3();
-    Tasks::Task4();
 }

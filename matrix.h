@@ -18,7 +18,7 @@ namespace Algebra {
     class Matrix {
     private:
         value *M;
-        size_t n, m;
+        size_t n = 1, m = 1;
 
         bool sign(const std::vector<size_t> &t) const {
             int c = 0;
@@ -51,13 +51,11 @@ namespace Algebra {
         }
 
     public:
-        Matrix(const size_t n_ = 1, const size_t m_ = 1, const value &x = value()) : n(n_), m(m_) {
+        Matrix(const size_t n_, const size_t m_, const value x = value()) : n(n_), m(m_) {
             M = new value[n * m];
             for (size_t i = 0; i < n; ++i) {
-                value *now_string = (M + i * m);
                 for (size_t j = 0; j < m; ++j) {
-                    value &now = *(now_string + j);
-                    now = x;
+                    *(M + i * m + j) = x;
                 }
             }
         }
@@ -157,20 +155,17 @@ namespace Algebra {
             if (m != other.n) {
                 fail("You cannot multiply matrix with different sizes");
             }
-            Matrix<value> ans(n, other.m);
+            Matrix<value> ans(n, other.m, 0);
             for (size_t i = 0; i < n; ++i) {
-                value *ans_string = ans.M + i * other.m;
                 for (size_t r = 0; r < m; ++r) {
-                    value *other_string = other.M + r * other.m;
                     value this_value = *(M + i * m + r);
                     for (size_t j = 0; j < other.m; ++j) {
-                        ans_string[j] += this_value * other_string[j];
+                        *(ans.M + i * other.m + j) += this_value * (*(other.M + r * other.m + j));
                     }
                 }
             }
             return ans;
         }
-
         bool operator==(const Matrix<value> &other) const {
             if (n != other.n || m != other.m) {
                 return false;

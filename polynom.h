@@ -3,7 +3,7 @@
 template<typename value>
 class Polynom {
 private:
-    std::vector<value> arr = {};
+    std::vector<value> arr;
 public:
     Polynom(size_t sz = 0) {
         arr.resize(sz);
@@ -102,7 +102,7 @@ public:
                     out << "- ";
                 else
                     out << "-";
-            } else if (!first){
+            } else if (!first) {
                 out << "+ ";
             }
             out << std::abs(p.arr[i]) << " * x^" << i << " ";
