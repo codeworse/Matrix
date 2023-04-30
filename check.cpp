@@ -2,84 +2,13 @@
 #include<vector>
 #include "matrix.h"
 #include "rational.h"
+#include "vector.h"
 
 namespace Matrix_tests {
     void fail(const char *message) {
         std::cerr << "FAIL: ";
         std::cerr << message;
         exit(0);
-    }
-
-    void check_constructor() {
-        std::cout << "Start checking constructor..." << std::endl;
-        {
-            Algebra::Matrix<long long> Mat_long(2, 2, 2);
-            std::vector<std::vector<long long> > Mat_long_vec = Mat_long;
-            if (std::vector<std::vector<long long> >({{2, 2},
-                                                      {2, 2}}) != Mat_long_vec) {
-                fail("wrong convert to std::vector<std::vector<long long> >");
-            }
-        }
-        std::cout << "Finish checking constructor" << std::endl;
-    }
-
-    void check_multiplication() {
-        std::cout << "Start checking multiplication..." << std::endl;
-        {
-            Algebra::Matrix<int> A({{1, 2},
-                                    {4, 3},
-                                    {5, 1}});
-            Algebra::Matrix<int> B({{0, 4,  3, 10},
-                                    {3, 12, 8, 3}});
-            Algebra::Matrix<int> correct_ans({{6, 28, 19, 16},
-                                              {9, 52, 36, 49},
-                                              {3, 32, 23, 53}});
-            Algebra::Matrix<int> C = A * B;
-            if (!(C == correct_ans)) {
-                fail("wrong answer in multiplication");
-            }
-        }
-        std::cout << "Finish checking multiplication" << std::endl;
-    }
-
-    void check_REF() {
-        std::cout << "Start checking REF..." << std::endl;
-        {
-            Algebra::Matrix<double> A({{1, 2, 3},
-                                       {4, 5, 6},
-                                       {7, 8, 10}});
-            auto A_REF = A.row_echelon_form();
-            std::vector<std::vector<double> > res = A_REF;
-            for (auto &l: res) {
-                for (auto x: l) {
-                    std::cout << x << " ";
-                }
-                std::cout << "\n";
-            }
-            std::cout << A_REF.det() << "\n";
-        }
-        {
-            Algebra::Matrix<double> A({{1, 1, 1},
-                                       {1, 1, 1},
-                                       {1, 1, 1}});
-            std::vector<std::vector<double> > res = A.row_echelon_form();
-        }
-        {
-
-        }
-        std::cout << "Finish checking REF" << std::endl;
-    }
-
-    void check_det() {
-        std::cout << "Start checking det..." << std::endl;
-        std::cout << "Finish checking det..." << std::endl;
-    }
-
-    void run_all() {
-        check_constructor();
-        check_multiplication();
-        check_REF();
-        check_det();
     }
 }
 namespace Tasks {
@@ -133,43 +62,92 @@ namespace Tasks {
         std::cout << "A = \n" << (A - 3).row_echelon_form() << "\n";
         Algebra::Matrix<double> u1({{1, 0, 0, -1, 0, 1}});
         Algebra::Matrix<double> u2({{-1, 0, 0, -1.5, 1, 0}});
-        auto u3 = u1.T();
-        std::cout << "ok\n";
-        Algebra::Matrix<double> R = A - 3;
-        Algebra::Matrix<double> ans = R * u3;
-        std::cout << ans;
+        std::cout << "(A - 3)^2:\n" << ((A - 3) * (A - 3)).row_echelon_form() << "\n";
+        Algebra::Matrix<double> v1({{-1, 0, 0, 0, 0, 5}});
+        Algebra::Matrix<double> v2({{-4, 0, 0, 0, 5, 0}});
+        Algebra::Matrix<double> v3({{-6, 0, 0, 5, 0, 0}});
+        Algebra::Matrix<double> v4({{-3, -5, 10, 0, 0, 0}});
+        std::cout << "f1 :\n" << ((A - 3) * v1.T()) << "\n";
+        std::cout << "f3 :\n" << ((A - 3) * v4.T()) << "\n";
+        std::cout << "(A - 4)^2 :\n" << ((A - 4) * (A - 4)).row_echelon_form() << "\n";
+        Algebra::Matrix<double> r1({{0, 0, 0, 0, 0, 1}});
+        Algebra::Matrix<double> r2({{2, -1, 1, -2, 2, 0}});
+        std::cout << "f5 :\n" << (A - 4) * r2.T() << "\n";
+        Algebra::Matrix<double> Base({{0,  -1, 0,  -3, 0, 2},
+                                      {0,  0,  0,  -5, 0, -1},
+                                      {0,  0,  0,  10, 0, 1},
+                                      {2,  0,  -9, 0,  0, -2},
+                                      {-4, 0,  8,  0,  0, 2},
+                                      {4,  5,  -3, 0,  1, 0}});
+        std::cout << Base.rank();
+    }
+
+    void Task3() {
+        std::cout << "-----Task 3-----\n";
+        Algebra::Matrix<double> g1({{-1, 2, 2}}), g2({{2, -3, -2}}), g3({{2, -2, -1}});
+        Algebra::Matrix<double> c1({{-1, -2, 2}}), c2({{-2, -3, 2}}), c3({{2, 2, -1}});
+        Algebra::Matrix<double> A({{-2, -3, -5},
+                                   {-6, -3, -9},
+                                   {6,  1,  7}});
+        std::cout << A * c1.T() << "\n" << A * c2.T() << "\n" << A * c3.T();
+        Algebra::Matrix<double> f1({{1, -1, -2}}), f2({{-1, 2, 3}}), f3({{-1, -1, -1}});
+        Algebra::Matrix<double> r1({{-1, -1, -1}}), r2({{4, 3, 1}}), r3({{-3, -2, -1}});
+        std::cout << "-\n";
+        Algebra::Matrix<double> B({{-2, 5, -6},
+                                   {-3, 6, -6},
+                                   {-2, 4, -4}});
+        std::cout << B * r1.T() << "\n" << B * r2.T() << "\n" << B * r3.T() << "\n";
+        Algebra::Matrix<double> A1({{-2, 3,  -5},
+                                    {-6, 3,  -9},
+                                    {6,  -1, 7}}), B1({{3, 1, 2},
+                                                       {3, 0, 3},
+                                                       {2, 0, 2}});
+        Algebra::Matrix<double> C = A1 * B1;
+        std::cout << "C: \n" << C;
+        std::cout << "A' : \n" << A1.row_echelon_form() << "\n";
+        std::cout << "B' : \n" << B1.row_echelon_form() << "\n";
+        //std::cout << A1 * (Algebra::Matrix<double> ({{-1, 1, 1}})).T();
     }
 
     void Task4() {
         std::cout << "-----Task 4-----\n";
+        Rational t = 1;
+        std::vector<std::vector<Rational> > arr({{-5,    0,     0, 0, 0},
+                                               {1,     -5,    0, 0, 0},
+                                               {t - (Rational)1, 0,     4, 0, 1},
+                                               {0,     0,     0, 4, 0},
+                                               {0,     t + (Rational)1, 0, t, 4}});
+        Algebra::Matrix<Rational> A(arr);
+        Algebra::Matrix<Rational> A4(A - 4);
+        Algebra::Matrix<Rational> A5(A - (-5));
+        std::cout << (A5 * A5).rank() << "\n";
+        std::cout << (A5 * A5 * A5).rank() << "\n";
+        std::cout << (A4).rank() << "\n";
+    }
 
-        Algebra::Matrix<double> A({{3,  -4, -1, 4},
-                                   {-7, 2,  4,  -3},
-                                   {1,  -4, 1,  4},
-                                   {-9, 0,  5,  -2}});
-        std::cout << "rk(A) = " << A.rank() << "\n";
-        std::cout << "rk(A^2) = " << (A * A).rank() << "\n";
-        std::cout << "rk(A^3) = " << (A * A * A).rank() << "\n";
-
-        std::cout << "A^2:\n" << A * A;
-
-        std::cout << "rk(A - 2) = " << (A - 2).rank() << "\n";
-        std::cout << "rk((A - 2)^2) = " << ((A - 2) * (A - 2)).rank() << "\n";
-        std::cout << "rk((A - 2)^3) = " << ((A - 2) * (A - 2) * (A - 2)).rank() << "\n";
-        std::cout << "(A - 2)^2:\n";
-        std::cout << ((A - 2) * (A - 2)) << "\n";
-
-        Algebra::Matrix<double> B({{1, 1},
-                                   {0, -2},
-                                   {2, 0},
-                                   {0, -2}});
-        Algebra::Matrix<double> C({{1, 0, -1, 0},
-                                   {0, 4, 0,  -3}});
-        std::cout << B * C << "\n";
+    void Task5() {
+        std::cout << "-----Task 5-----\n";
+        Algebra::Matrix<double> B({{0, 0, 2,  3},
+                                   {0, 0, 3,  5},
+                                   {2, 3, 2,  -1},
+                                   {3, 5, -1, -7}});
+        Algebra::Vector<double> v1({2, -2, 1, -1}), v2({2, 0, 0, 1}), v3({-8, 5, 0, 1}), v4({3, -1, -1, 1});
+        std::vector<Algebra::Vector<double> > V({v1, v2, v3, v4});
+        for (size_t i = 0; i < 4; ++i) {
+            for (size_t j = 0; j < 4; ++j) {
+                std::cout << V[i].T() * B * V[j] << " ";
+            }
+            std::cout << "\n";
+        }
+        Algebra::Matrix<double> Base = v1 | v2 | v3 | v4;
+        std::cout << Base.rank();
     }
 }
 
 int main() {
     Tasks::Task1();
     Tasks::Task2();
+    Tasks::Task3();
+    Tasks::Task4();
+    Tasks::Task5();
 }

@@ -1,6 +1,7 @@
 #include "polynom.h"
 #include<algorithm>
-
+#ifndef MATRIX_MATRIX_H
+#define MATRIX_MATRIX_H
 namespace Algebra {
     template<typename value>
     class Matrix;
@@ -16,8 +17,8 @@ namespace Algebra {
 
     template<typename value>
     class Matrix {
-    private:
-        value *M;
+    protected:
+        std::vector<std::vector<value> > M;
         size_t n = 1, m = 1;
 
         bool sign(const std::vector<size_t> &t) const {
@@ -32,7 +33,7 @@ namespace Algebra {
             return !(c % 2);
         }
 
-        void fail(const char *message) const {
+        static void fail(const char *message) {
             std::cerr << "FAIL: ";
             std::cerr << message;
             exit(0);
@@ -41,53 +42,46 @@ namespace Algebra {
         Matrix<value> E(size_t n_) {
             Matrix<value> ans(n_, n_);
             for (size_t i = 0; i < n_; ++i) {
-                value *ans_string = ans.M + i * n_;
                 for (size_t j = 0; j < n_; ++j) {
-                    *(ans_string + j) = 0;
+                   M[i][j] = 0;
                 }
-                *(ans_string + i) = 1;
+                M[i][i] = 1;
             }
             return ans;
         }
 
     public:
+        Matrix() {
+            n = 1;
+            m = 1;
+            M.resize(n, std::vector<value> (m, value()));
+        }
         Matrix(const size_t n_, const size_t m_, const value x = value()) : n(n_), m(m_) {
-            M = new value[n * m];
+            M.resize(n, std::vector<value> (m));
             for (size_t i = 0; i < n; ++i) {
                 for (size_t j = 0; j < m; ++j) {
-                    *(M + i * m + j) = x;
+                    M[i][j] = x;
                 }
             }
         }
 
         Matrix(const std::vector<std::vector<value> > &arr) : n(arr.size()), m(arr[0].size()) {
-            M = new value[n * m];
+            M.resize(n, std::vector<value> (m));
             for (size_t i = 0; i < n; ++i) {
-                value *now_string = M + i * m;
                 for (size_t j = 0; j < m; ++j) {
-                    *(now_string + j) = arr[i][j];
+                    M[i][j] = arr[i][j];
                 }
             }
         }
-
         operator std::vector<std::vector<value> >() const {
-            std::vector<std::vector<value> > ans(n, std::vector<value>(m));
-            for (size_t i = 0; i < n; ++i) {
-                value *now_string = M + i * m;
-                for (size_t j = 0; j < m; ++j) {
-                    ans[i][j] = *(now_string + j);
-                }
-            }
-            return ans;
+            return M;
         }
 
         Matrix(const Matrix<value> &other) : n(other.n), m(other.m) {
-            M = new value[n * m];
+            M.resize(n, std::vector<value> (m));
             for (size_t i = 0; i < n; ++i) {
-                value *now_string = M + i * m;
-                const value *other_string = other.M + i * m;
                 for (size_t j = 0; j < m; ++j) {
-                    *(now_string + j) = *(other_string + j);
+                    M[i][j] = other.M[i][j];
                 }
             }
         }
@@ -96,15 +90,12 @@ namespace Algebra {
             if (this == &other) {
                 return *this;
             }
-            delete[] M;
             n = other.n;
             m = other.m;
-            M = new value[n * m];
+            M.resize(n, std::vector<value> (m));
             for (size_t i = 0; i < n; ++i) {
-                value *now_string = M + i * m;
-                value *other_string = other.M + i * m;
                 for (size_t j = 0; j < m; ++j) {
-                    *(M + i * m + j) = *(other_string + j);
+                    M[i][j] = other.M[i][j];
                 }
             }
             return *this;
@@ -114,12 +105,10 @@ namespace Algebra {
             if (n != other.n || m != other.m) {
                 fail("You cannot add matrix with different sizes");
             }
-            Matrix<value> ans(other);
+            Matrix<value> ans(*this);
             for (size_t i = 0; i < n; ++i) {
-                value *this_string = M + i * m;
-                value *ans_string = ans.M + i * m;
                 for (size_t j = 0; j < m; ++j) {
-                    *(ans_string + j) += *(this_string + j);
+                    ans.M[i][j] += other.M[i][j];
                 }
             }
             return ans;
@@ -131,10 +120,8 @@ namespace Algebra {
             }
             Matrix<value> ans(*this);
             for (size_t i = 0; i < n; ++i) {
-                value *other_string = M + i * m;
-                value *ans_string = ans.M + i * m;
                 for (size_t j = 0; j < m; ++j) {
-                    *(ans_string + j) -= *(other_string + j);
+                    ans.M[i][j] -= other.M[i][j];
                 }
             }
             return ans;
@@ -143,9 +130,8 @@ namespace Algebra {
         Matrix<value> operator-() const {
             Matrix<value> ans(*this);
             for (size_t i = 0; i < n; ++i) {
-                value *this_string = M + i * m;
                 for (size_t j = 0; j < m; ++j) {
-                    *(this_string + j) = -*(this_string + j);
+                    M[i][j] = -M[i][j];
                 }
             }
             return ans;
@@ -158,10 +144,19 @@ namespace Algebra {
             Matrix<value> ans(n, other.m, 0);
             for (size_t i = 0; i < n; ++i) {
                 for (size_t r = 0; r < m; ++r) {
-                    value this_value = *(M + i * m + r);
+                    value this_value = M[i][r];
                     for (size_t j = 0; j < other.m; ++j) {
-                        *(ans.M + i * other.m + j) += this_value * (*(other.M + r * other.m + j));
+                        ans.M[i][j] += this_value * other.M[r][j];
                     }
+                }
+            }
+            return ans;
+        }
+        Matrix<value> operator*(const value &x) {
+            Matrix<value> ans(*this);
+            for (size_t i = 0; i < n; ++i) {
+                for (size_t j = 0; j < m; ++j) {
+                    ans.M[i][j] *= x;
                 }
             }
             return ans;
@@ -171,10 +166,8 @@ namespace Algebra {
                 return false;
             }
             for (size_t i = 0; i < n; ++i) {
-                value *this_string = M + i * m;
-                value *other_string = M + i * m;
                 for (size_t j = 0; j < m; ++j) {
-                    if (!(*(this_string + j) == *(other_string + j))) {
+                    if (!(M[i][j] == other.M[i][j])) {
                         return false;
                     }
                 }
@@ -191,7 +184,7 @@ namespace Algebra {
                     break;
                 }
                 for (int index = i; index < n; ++index) {
-                    if (*(ans.M + index * m + i + d) != 0) {
+                    if (ans.M[index][i + d] != 0) {
                         non_zero_index = index;
                         break;
                     }
@@ -205,17 +198,15 @@ namespace Algebra {
                     continue;
                 }
                 if (non_zero_index != i) {
-                    value *i_string = (ans.M + i * m);
-                    value *non_zero_string = (ans.M + non_zero_index * m);
                     for (size_t j = 0; j < m; ++j) {
-                        std::swap(*(i_string + j), *(non_zero_string + j));
+                        std::swap(ans.M[i][j], ans.M[non_zero_index][j]);
                     }
                 }
                 for (size_t j = i + 1; j < n; ++j) {
-                    value k = (-(*(ans.M + j * m + i + d))) / *(ans.M + i * m + i + d);
+                    value k = (-ans.M[j][i + d]) / ans.M[i][i + d];
                     for (size_t r = 0; r < m; ++r) {
-                        value now_value = *(ans.M + i * m + r);
-                        *(ans.M + j * m + r) += k * now_value;
+                        value now_value = ans.M[i][r];
+                        ans.M[j][r] += k * now_value;
                     }
                 }
             }
@@ -227,9 +218,9 @@ namespace Algebra {
                 fail("det can be count only for square matrix");
             }
             Matrix<value> ref = this->row_echelon_form();
-            value ans = *(ref.M);
+            value ans = ref.M[0][0];
             for (size_t i = 1; i < n; ++i) {
-                ans *= *(ref.M + i * m + i);
+                ans *= ref.M[i][i];
             }
             return ans;
         }
@@ -253,11 +244,11 @@ namespace Algebra {
 
         friend std::ostream &operator<<(std::ostream &out, const Matrix<value> &a) {
             for (size_t i = 0; i < a.n; ++i) {
-                value *a_string = a.M + i * a.m;
                 for (size_t j = 0; j < a.m; ++j) {
-                    out << *(a_string + j) << "\t";
+                    out << a.M[i][j] << "\t";
                 }
-                out << "\n";
+                if (i < a.n - 1)
+                    out << "\n";
             }
             return out;
         }
@@ -277,20 +268,20 @@ namespace Algebra {
                 {
                     Polynom<value> p(2);
                     if (0 == t[0]) {
-                        p.get_k(0) = *(M + t[0]);
+                        p.get_k(0) = M[0][0];
                         p.get_k(1) = -1;
                     } else {
-                        p.get_k(0) = *(M + t[0]);
+                        p.get_k(0) = M[0][t[0]];
                     }
                     now = p;
                 }
                 for (size_t i = 1; i < t.size(); ++i) {
                     Polynom<value> p(2);
                     if (i == t[i]) {
-                        p.get_k(0) = *(M + i * m + t[i]);
+                        p.get_k(0) = M[i][t[i]];
                         p.get_k(1) = -1;
                     } else {
-                        p.get_k(0) = *(M + i * m + t[i]);
+                        p.get_k(0) = M[i][t[i]];
                     }
                     now = now * p;
                 }
@@ -308,9 +299,8 @@ namespace Algebra {
             int rk = n;
             for (size_t i = 0; i < n; ++i) {
                 bool zero_line = true;
-                value *now_string = Mat.M + i * m;
                 for (size_t j = 0; j < m; ++j) {
-                    if (*(now_string + j) != 0) {
+                    if (Mat.M[i][j] != 0) {
                         zero_line = false;
                     }
                 }
@@ -326,7 +316,7 @@ namespace Algebra {
             }
             Matrix<value> A(*this);
             for (size_t i = 0; i < n; ++i) {
-                *(A.M + i * m + i) -= x;
+                A.M[i][i] -= x;
             }
             return A;
         }
@@ -335,24 +325,41 @@ namespace Algebra {
             if (i >= n || j >= m) {
                 fail("index out of range in get_value function");
             }
-            return *(M + i * m + j);
+            return M[i][j];
         }
 
         Matrix<value> T() const {
             Matrix<value> ans(m, n);
             for (size_t i = 0; i < n; ++i) {
-                value *this_string = M + i * m;
                 for (size_t j = 0; j < m; ++j) {
-                    *(ans.M + j * m + i) = *(this_string + j);
+                    ans.M[j][i] = M[i][j];
                 }
             }
             return ans;
         }
-
+        friend Matrix<value> operator|(const Matrix<value> &a, const Matrix<value> &b) {
+            if (a.n != b.n) {
+                fail("in operator| diff sizes");
+            }
+            Matrix<value> ans(a.n, a.m + b.m);
+            for (size_t i = 0; i < a.n; ++i) {
+                for (size_t j = 0; j < a.m; ++j) {
+                    ans.M[i][j] = a.M[i][j];
+                }
+                for (size_t j = 0; j < b.m; ++j) {
+                    ans.M[i][j + a.m] = b.M[i][j];
+                }
+            }
+            return ans;
+        }
+        size_t get_column() const {
+            return n;
+        }
+        size_t get_row() const {
+            return m;
+        }
         ~Matrix() {
-            delete[] M;
         }
     };
-
-
 }
+#endif MATRIX_MATRIX_H

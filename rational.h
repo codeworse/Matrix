@@ -1,5 +1,6 @@
 #include<iostream>
-
+#ifndef MATRIX_RATIONAL_H
+#define MATRIX_RATIONAL_H
 class Rational {
 private:
     long long x, y; /// x / y
@@ -98,7 +99,16 @@ public:
         ans.update();
         return ans;
     }
-
+    friend Rational operator-(const Rational &a, const Rational &b) {
+        Rational ans = a;
+        ans = ans - b;
+        return ans;
+    }
+    friend Rational operator+(const Rational &a, const Rational &b) {
+        Rational ans = a;
+        ans = ans + b;
+        return ans;
+    }
     friend std::istream &operator>>(std::istream &in, Rational &r) {
         in >> r.x >> r.y;
         return in;
@@ -124,3 +134,4 @@ namespace std {
         return ans;
     }
 }
+#endif //MATRIX_RATIONAL_H

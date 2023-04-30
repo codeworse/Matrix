@@ -1,5 +1,6 @@
 #include<vector>
-
+#ifndef MATRIX_POLYNOM_H
+#define MATRIX_POLYNOM_H
 template<typename value>
 class Polynom {
 private:
@@ -110,5 +111,5 @@ public:
         }
         return out;
     }
-
 };
+#endif //MATRIX_POLYNOM_H
